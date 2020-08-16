@@ -1,20 +1,16 @@
-provider "aws" {
-  version = "~> 3.2"
-  region  = "ap-northeast-1"
-}
-
 resource "aws_lambda_function" "get_question_categories" {
-  function_name = "frankii-get-question-categories"
+  function_name = var.frankii_get_question_categories_function_name
 
-  # The bucket name as created earlier with "aws s3api create-bucket"
-  s3_bucket = "frankii_lambda_functions"
-  s3_key    = "v1.0.0/example.zip"
+  # The bucket name as created earlier with in ../s3
+  s3_bucket = "frankii-lambda-functions"
+  s3_key    = "v${var.app_version}/${var.frankii_get_question_categories_function_name}.zip"
 
-  # "main" is the filename within the zip file (main.js) and "handler"
+  # "var.frankii_get_question_categories_function_name" is the filename within the zip file
+  #(${var.frankii_get_question_categories_function_name}.js) and "handler"
   # is the name of the property under which the handler function was
   # exported in that file.
-  handler = "main.handler"
-  runtime = "nodejs10.x"
+  handler = "${var.frankii_get_question_categories_function_name}.handler"
+  runtime = "nodejs12.x"
 
   role = aws_iam_role.frankii_lambda_iam_role.arn
 }
@@ -22,8 +18,7 @@ resource "aws_lambda_function" "get_question_categories" {
 # IAM role which dictates what other AWS services the Lambda function
 # may access.
 resource "aws_iam_role" "frankii_lambda_iam_role" {
-  name = "frankii_lambda_iam_role"
-
+  name               = "frankii_lambda_iam_role"
   assume_role_policy = <<EOF
 {
   "Version": "2012-10-17",
@@ -39,7 +34,16 @@ resource "aws_iam_role" "frankii_lambda_iam_role" {
   ]
 }
 EOF
+}
 
+resource "aws_iam_role_policy_attachment" "role-policy-attachment" {
+  //  leaving for_each here in case multiple role policies need to be attached in future
+  for_each = toset([
+    "arn:aws:iam::aws:policy/AmazonDynamoDBFullAccess"
+  ])
+
+  role       = aws_iam_role.frankii_lambda_iam_role.name
+  policy_arn = each.value
 }
 
 resource "aws_lambda_permission" "apigw" {
