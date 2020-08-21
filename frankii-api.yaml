@@ -1,0 +1,173 @@
+openapi: "3.0.0"
+info:
+  description: ""
+  version: "1.0.0"
+  title: "Frankii API設計"
+  termsOfService: "http://swagger.io/terms/"
+  contact:
+    email: "jlee.yvr96@gmail.com"
+  license:
+    name: "Apache 2.0"
+    url: "http://www.apache.org/licenses/LICENSE-2.0.html"
+tags:
+  - name: "Category"
+    description: "質問のカテゴリ"
+  - name: "Input Template"
+    description: "質問者の入力テンプレート"
+  - name: "Admin Actions"
+    description: "Adminが操作するAPI"
+  - name: "Format"
+    description: "質問者の文書フォーマット化"
+
+paths:
+  /user/question-categories:
+    get:
+      tags:
+        - "Category"
+      summary: "登録された質問カテゴリ一覧を取得"
+      responses:
+        200:
+          description: "成功時のレスポンス"
+          content:
+            application/json:
+              schema:
+                type: "array"
+                items:
+                  $ref: "#/components/schemas/Category"
+
+  /user/input-template/{category}:
+    get:
+      tags:
+        - "Input Template"
+      summary: "該当カテゴリの質問者入力テンプレート"
+      description: "Frankiiを使用する際、質問者が入力するべき項目"
+      parameters:
+        - in: "path"
+          name: "category"
+          schema:
+            type: string
+          required: true
+      responses:
+        200:
+          description: "成功時のレスポンス"
+          content:
+            application/json:
+              schema:
+                type: "array"
+                items:
+                  $ref: "#/components/schemas/Template"
+
+  /admin/template/register:
+    post:
+      tags:
+        - "Admin Actions"
+      summary: "テンプレート登録"
+      description: "todo add body"
+      responses:
+        200:
+          description: "成功時のレスポンス"
+          content:
+            application/json:
+              schema:
+                type: "string"
+
+  /user/format:
+    get:
+      tags:
+        - "Format"
+      description: "todo"
+      responses:
+        200:
+          description: "成功時のレスポンス"
+          content:
+            application/json:
+              schema:
+                type: "string"
+                example: "success"
+
+  /admin/template/delete:
+    post:
+      tags:
+        - "Admin Actions"
+      summary: "テンプレート削除"
+      description: "todo"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: "array"
+              items:
+                type: "object"
+                properties:
+                  category:
+                    type: "string"
+                    description: ""
+      responses:
+        200:
+          description: ""
+          content:
+            application/json:
+              schema:
+                type: "string"
+                example: "success"
+
+components:
+  schemas:
+    Category:
+      type: "object"
+      properties:
+        category:
+          type: "string"
+          description: ""
+        displayText:
+          type: "string"
+          description: "表示用テキスト"
+        description:
+          type: "string"
+          description: "説明"
+    Template:
+      type: "object"
+      properties:
+        category:
+          type: "string"
+        blocks:
+          type: "array"
+          items:
+            $ref: "#/components/schemas/TemplateBlock"
+      xml:
+        name: "Category"
+    TemplateBlock:
+      type: "object"
+      description: "テンプレート内、１つのの入力項目。テキストボックスとドロップダウン2種類を想定している"
+      properties:
+        blockId:
+          type: "integer"
+          description: "IDの昇順でBlockが表示される"
+        label:
+          type: "string"
+        type:
+          type: "string"
+          description: "INPUT/SELECT 2種類"
+        multiline:
+          type: "boolean"
+          nullable: true
+          description: "typeはSELECTの場合、trueはmultilineのテキストボックスになる"
+        options:
+          type: "array"
+          nullable: true
+          items:
+            $ref: "#/components/schemas/DropdownOptions"
+    DropdownOptions:
+      type: "object"
+      description: "ドロップダウンの項目"
+      properties:
+        text:
+          type: "string"
+          description: "表示されるテキスト（例：エラー）"
+        value:
+          type: "string"
+          description: "例：error"
+externalDocs:
+  description: "Find out more about Frankii"
+  url: "https://angel-dojo-cac.atlassian.net/wiki/spaces/ADCAC/overview?homepageId=33179"
