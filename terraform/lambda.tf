@@ -15,6 +15,19 @@ resource "aws_lambda_function" "get_question_categories" {
   role = aws_iam_role.frankii_lambda_iam_role.arn
 }
 
+resource "aws_lambda_function" "get_input_template" {
+  function_name = var.frankii_get_input_template_function_name
+
+  # The bucket name as created earlier with in ../s3
+  s3_bucket = "frankii-lambda-functions"
+  s3_key    = "v${var.app_version}/${var.frankii_get_input_template_function_name}.zip"
+
+  handler = "${var.frankii_get_input_template_function_name}.handler"
+  runtime = "nodejs12.x"
+
+  role = aws_iam_role.frankii_lambda_iam_role.arn
+}
+
 # IAM role which dictates what other AWS services the Lambda function
 # may access.
 resource "aws_iam_role" "frankii_lambda_iam_role" {
@@ -46,10 +59,21 @@ resource "aws_iam_role_policy_attachment" "role-policy-attachment" {
   policy_arn = each.value
 }
 
-resource "aws_lambda_permission" "apigw" {
+resource "aws_lambda_permission" "apigw_get_question_categories" {
   statement_id  = "AllowAPIGatewayInvoke"
   action        = "lambda:InvokeFunction"
   function_name = aws_lambda_function.get_question_categories.function_name
+  principal     = "apigateway.amazonaws.com"
+
+  # The "/*/*" portion grants access from any method on any resource
+  # within the API Gateway REST API.
+  source_arn = "${aws_api_gateway_rest_api.frankii_api.execution_arn}/*/*"
+}
+
+resource "aws_lambda_permission" "apigw_get_input_template" {
+  statement_id  = "AllowAPIGatewayInvoke"
+  action        = "lambda:InvokeFunction"
+  function_name = aws_lambda_function.get_input_template.function_name
   principal     = "apigateway.amazonaws.com"
 
   # The "/*/*" portion grants access from any method on any resource
