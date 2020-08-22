@@ -7,6 +7,9 @@ exports.handler = async (event) => {
     let data = await getQuestionCategories();
     const response = {
         statusCode: 200,
+        headers: {
+            'Access-Control-Allow-Origin' : '*'
+        },
         body: JSON.stringify(data.Items),
         isBase64Encoded: false
     };
@@ -16,7 +19,7 @@ exports.handler = async (event) => {
 function getQuestionCategories() {
     const params = {
         TableName: 'frankiis_questions',
-        ProjectionExpression: "category, displayText"
+        ProjectionExpression: "category, displayText, description"
     };
     return dynamodb.scan(params, (err, data) => {
         if (err) {
@@ -24,3 +27,4 @@ function getQuestionCategories() {
         }
     }).promise();
 }
+

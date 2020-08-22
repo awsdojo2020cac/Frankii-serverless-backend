@@ -1,8 +1,8 @@
 openapi: "3.0.0"
 info:
-  description: ""
+  title: ${title}
   version: "1.0.0"
-  title: "Frankii API設計"
+  description: "Frankii's API"
   termsOfService: "http://swagger.io/terms/"
   contact:
     email: "jlee.yvr96@gmail.com"
@@ -34,6 +34,26 @@ paths:
                 type: "array"
                 items:
                   $ref: "#/components/schemas/Category"
+      x-amazon-apigateway-integration:
+        uri: ${get_question_categories_function_invoke_arn}
+        httpMethod: "POST"
+        type: "aws_proxy"
+    options:
+      description: Allow CORS
+      responses:
+        200:
+          $ref: '#/components/responses/cors'
+      x-amazon-apigateway-integration:
+        type: mock
+        requestTemplates:
+          application/json: "{ \"statusCode\": 200 }"
+        responses:
+          default:
+            statusCode: "200"
+            responseParameters:
+              method.response.header.Access-Control-Allow-Methods: "'GET'"
+              method.response.header.Access-Control-Allow-Headers: "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token'"
+              method.response.header.Access-Control-Allow-Origin: "'*'"
 
   /user/input-template/{category}:
     get:
@@ -56,6 +76,29 @@ paths:
                 type: "array"
                 items:
                   $ref: "#/components/schemas/Template"
+      x-amazon-apigateway-integration:
+        uri: ${get_input_template_function_invoke_arn}
+        httpMethod: "POST"
+        type: "aws_proxy"
+        request_parameters: {
+          "integration.request.path.category":  "method.request.path.category"
+        }
+    options:
+      description: Allow CORS
+      responses:
+        200:
+          $ref: '#/components/responses/cors'
+      x-amazon-apigateway-integration:
+        type: mock
+        requestTemplates:
+          application/json: "{ \"statusCode\": 200 }"
+        responses:
+          default:
+            statusCode: "200"
+            responseParameters:
+              method.response.header.Access-Control-Allow-Methods: "'GET'"
+              method.response.header.Access-Control-Allow-Headers: "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token'"
+              method.response.header.Access-Control-Allow-Origin: "'*'"
 
   /admin/template/register:
     post:
@@ -70,6 +113,10 @@ paths:
             application/json:
               schema:
                 type: "string"
+      x-amazon-apigateway-integration:
+        uri: ${get_question_categories_function_invoke_arn}
+        httpMethod: "POST"
+        type: "aws_proxy"
 
   /user/format:
     get:
@@ -84,6 +131,10 @@ paths:
               schema:
                 type: "string"
                 example: "success"
+      x-amazon-apigateway-integration:
+        uri: ${get_question_categories_function_invoke_arn}
+        httpMethod: "POST"
+        type: "aws_proxy"
 
   /admin/template/delete:
     post:
@@ -111,6 +162,10 @@ paths:
               schema:
                 type: "string"
                 example: "success"
+      x-amazon-apigateway-integration:
+        uri: ${get_question_categories_function_invoke_arn}
+        httpMethod: "POST"
+        type: "aws_proxy"
 
 components:
   schemas:
@@ -168,6 +223,27 @@ components:
         value:
           type: "string"
           description: "例：error"
+  responses:
+    cors:
+      description: "200 response"
+      headers:
+        Access-Control-Allow-Origin:
+          schema:
+            type: "string"
+        Access-Control-Allow-Methods:
+          schema:
+            type: "string"
+        Access-Control-Max-Age:
+          schema:
+            type: "string"
+        Access-Control-Allow-Headers:
+          schema:
+            type: "string"
+      content:
+        application/json:
+          schema:
+            type: string
+
 externalDocs:
   description: "Find out more about Frankii"
   url: "https://angel-dojo-cac.atlassian.net/wiki/spaces/ADCAC/overview?homepageId=33179"
