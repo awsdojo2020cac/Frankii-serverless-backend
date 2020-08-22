@@ -7,7 +7,10 @@ exports.handler = async (event) => {
     let data = await getInputTemplate(event.pathParameters.category)
     const response = {
         statusCode: 200,
-        body: JSON.stringify(data["Item"])
+        body: JSON.stringify(data["Item"]),
+        headers: {
+            'Access-Control-Allow-Origin': '*'
+        }
     };
     return response;
 };

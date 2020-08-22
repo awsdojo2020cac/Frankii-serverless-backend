@@ -1,3 +1,7 @@
+variable "api_name" {
+  type    = string
+  default = "Frankii API"
+}
 variable "app_version" {
   type    = string
   default = "1.0.0"
