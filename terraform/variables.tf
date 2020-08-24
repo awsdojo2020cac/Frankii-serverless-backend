@@ -23,3 +23,8 @@ variable "frankii_get_input_template_function_name" {
   default = "frankii-get-input-template"
 }
 
+variable "frankii_register_input_template_function_name" {
+  type    = string
+  default = "frankii-register-input-template"
+}
+
