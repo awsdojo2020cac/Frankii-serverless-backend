@@ -1,9 +1,6 @@
 resource "aws_lambda_function" "get_question_categories" {
   function_name = var.frankii_get_question_categories_function_name
-
-  # The bucket name as created earlier with in ../s3
-  s3_bucket = "frankii-lambda-functions"
-  s3_key    = "v${var.app_version}/${var.frankii_get_question_categories_function_name}.zip"
+  filename      = "../app/${var.frankii_get_question_categories_function_name}.zip"
 
   # "var.frankii_get_question_categories_function_name" is the filename within the zip file
   #(${var.frankii_get_question_categories_function_name}.js) and "handler"
@@ -17,24 +14,18 @@ resource "aws_lambda_function" "get_question_categories" {
 
 resource "aws_lambda_function" "get_input_template" {
   function_name = var.frankii_get_input_template_function_name
-
-  s3_bucket = "frankii-lambda-functions"
-  s3_key    = "v${var.app_version}/${var.frankii_get_input_template_function_name}.zip"
-
-  handler = "${var.frankii_get_input_template_function_name}.handler"
-  runtime = "nodejs12.x"
+  filename      = "../app/${var.frankii_get_input_template_function_name}.zip"
+  handler       = "${var.frankii_get_input_template_function_name}.handler"
+  runtime       = "nodejs12.x"
 
   role = aws_iam_role.frankii_lambda_iam_role.arn
 }
 
 resource "aws_lambda_function" "register_input_template" {
   function_name = var.frankii_register_input_template_function_name
-
-  s3_bucket = "frankii-lambda-functions"
-  s3_key    = "v${var.app_version}/${var.frankii_register_input_template_function_name}.zip"
-
-  handler = "${var.frankii_register_input_template_function_name}.handler"
-  runtime = "nodejs12.x"
+  filename      = "../app/${var.frankii_register_input_template_function_name}.zip"
+  handler       = "${var.frankii_register_input_template_function_name}.handler"
+  runtime       = "nodejs12.x"
 
   role = aws_iam_role.frankii_lambda_iam_role.arn
 }
