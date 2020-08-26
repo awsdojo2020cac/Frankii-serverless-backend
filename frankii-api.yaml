@@ -141,10 +141,16 @@ paths:
               method.response.header.Access-Control-Allow-Origin: "'*'"
 
   /user/format:
-    get:
+    post:
       tags:
         - "Format"
-      description: "todo"
+      description: ""
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
       responses:
         200:
           description: "成功時のレスポンス"
@@ -227,6 +233,10 @@ components:
           type: "array"
           items:
              $ref: "#/components/schemas/TemplateBlock"
+        template:
+          type: "array"
+          items:
+            type: "string"
     TemplateBlock:
       type: "object"
       description: "テンプレート内、１つのの入力項目。テキストボックスとドロップダウン2種類を想定している"
@@ -234,20 +244,14 @@ components:
         blockId:
           type: "integer"
           description: "IDの昇順でBlockが表示される"
+        key:
+          type: "string"
         label:
           type: "string"
-        type:
-          type: "string"
-          description: "INPUT/SELECT 2種類"
         multiline:
           type: "boolean"
           nullable: true
           description: "typeはSELECTの場合、trueはmultilineのテキストボックスになる"
-        options:
-          type: "array"
-          nullable: true
-          items:
-            $ref: "#/components/schemas/DropdownOptions"
     DropdownOptions:
       type: "object"
       description: "ドロップダウンの項目"
