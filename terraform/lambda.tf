@@ -30,6 +30,15 @@ resource "aws_lambda_function" "register_input_template" {
   role = aws_iam_role.frankii_lambda_iam_role.arn
 }
 
+resource "aws_lambda_function" "format_service" {
+  function_name = var.frankii_format_service_function_name
+  filename      = "../app/${var.frankii_get_question_categories_function_name}.zip"
+  handler       = "${var.frankii_get_question_categories_function_name}.handler"
+  runtime       = "nodejs12.x"
+
+  role = aws_iam_role.frankii_lambda_iam_role.arn
+}
+
 # IAM role which dictates what other AWS services the Lambda function
 # may access.
 resource "aws_iam_role" "frankii_lambda_iam_role" {
@@ -51,7 +60,7 @@ resource "aws_iam_role" "frankii_lambda_iam_role" {
 EOF
 }
 
-resource "aws_iam_role_policy_attachment" "role-policy-attachment" {
+resource "aws_iam_role_policy_attachment" "role_policy_attachment" {
   //  leaving for_each here in case multiple role policies need to be attached in future
   for_each = toset([
     "arn:aws:iam::aws:policy/AmazonDynamoDBFullAccess"
@@ -61,32 +70,18 @@ resource "aws_iam_role_policy_attachment" "role-policy-attachment" {
   policy_arn = each.value
 }
 
-resource "aws_lambda_permission" "apigw_get_question_categories" {
-  statement_id  = "AllowAPIGatewayInvoke"
-  action        = "lambda:InvokeFunction"
-  function_name = aws_lambda_function.get_question_categories.function_name
-  principal     = "apigateway.amazonaws.com"
+resource "aws_lambda_permission" "apigw_lambda_permission" {
+  for_each = toset([
+    aws_lambda_function.get_question_categories.function_name,
+    aws_lambda_function.get_input_template.function_name,
+    aws_lambda_function.register_input_template.function_name,
+    aws_lambda_function.format_service.function_name
+  ])
 
-  # The "/*/*" portion grants access from any method on any resource
-  # within the API Gateway REST API.
-  source_arn = "${aws_api_gateway_rest_api.frankii_api.execution_arn}/*/*"
-}
+  statement_id = "AllowAPIGatewayInvoke"
+  action       = "lambda:InvokeFunction"
 
-resource "aws_lambda_permission" "apigw_get_input_template" {
-  statement_id  = "AllowAPIGatewayInvoke"
-  action        = "lambda:InvokeFunction"
-  function_name = aws_lambda_function.get_input_template.function_name
-  principal     = "apigateway.amazonaws.com"
-
-  # The "/*/*" portion grants access from any method on any resource
-  # within the API Gateway REST API.
-  source_arn = "${aws_api_gateway_rest_api.frankii_api.execution_arn}/*/*"
-}
-
-resource "aws_lambda_permission" "apigw_register_input_template" {
-  statement_id  = "AllowAPIGatewayInvoke"
-  action        = "lambda:InvokeFunction"
-  function_name = aws_lambda_function.register_input_template.function_name
+  function_name = each.value
   principal     = "apigateway.amazonaws.com"
 
   # The "/*/*" portion grants access from any method on any resource

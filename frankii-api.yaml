@@ -160,9 +160,25 @@ paths:
                 type: "string"
                 example: "success"
       x-amazon-apigateway-integration:
-        uri: ${get_question_categories_function_invoke_arn}
+        uri: ${format_service_function_invoke_arn}
         httpMethod: "POST"
         type: "aws_proxy"
+    options:
+      description: Allow CORS
+      responses:
+        200:
+          $ref: '#/components/responses/cors'
+      x-amazon-apigateway-integration:
+        type: mock
+        requestTemplates:
+          application/json: "{ \"statusCode\": 200 }"
+        responses:
+          default:
+            statusCode: "200"
+            responseParameters:
+              method.response.header.Access-Control-Allow-Methods: "'POST'"
+              method.response.header.Access-Control-Allow-Headers: "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token'"
+              method.response.header.Access-Control-Allow-Origin: "'*'"
 
   /admin/template/delete:
     post:
@@ -232,7 +248,7 @@ components:
         blocks:
           type: "array"
           items:
-             $ref: "#/components/schemas/TemplateBlock"
+            $ref: "#/components/schemas/TemplateBlock"
         template:
           type: "array"
           items:

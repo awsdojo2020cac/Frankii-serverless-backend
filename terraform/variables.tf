@@ -28,3 +28,8 @@ variable "frankii_register_input_template_function_name" {
   default = "frankii-register-input-template"
 }
 
+variable "frankii_format_service_function_name" {
+  type    = string
+  default = "frankii-format-service"
+}
+
