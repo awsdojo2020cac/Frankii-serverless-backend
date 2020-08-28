@@ -160,32 +160,21 @@ paths:
                 type: "string"
                 example: "success"
       x-amazon-apigateway-integration:
-        uri: ${format_service_function_invoke_arn}
+        uri: ${get_question_categories_function_invoke_arn}
         httpMethod: "POST"
         type: "aws_proxy"
-    options:
-      description: Allow CORS
-      responses:
-        200:
-          $ref: '#/components/responses/cors'
-      x-amazon-apigateway-integration:
-        type: mock
-        requestTemplates:
-          application/json: "{ \"statusCode\": 200 }"
-        responses:
-          default:
-            statusCode: "200"
-            responseParameters:
-              method.response.header.Access-Control-Allow-Methods: "'POST'"
-              method.response.header.Access-Control-Allow-Headers: "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token'"
-              method.response.header.Access-Control-Allow-Origin: "'*'"
 
-  /admin/template/delete:
+  /admin/template/delete/{category}:
     post:
       tags:
         - "Admin Actions"
       summary: "テンプレート削除"
-      description: "todo"
+      parameters:
+        - in: "path"
+          name: "category"
+          schema:
+            type: string
+          required: true
       requestBody:
         required: true
         content:
@@ -207,9 +196,29 @@ paths:
                 type: "string"
                 example: "success"
       x-amazon-apigateway-integration:
-        uri: ${get_question_categories_function_invoke_arn}
+        uri: ${delete_input_template_function_invoke_arn}
         httpMethod: "POST"
         type: "aws_proxy"
+        request_parameters: {
+          "integration.request.path.category":  "method.request.path.category"
+        }
+    options:
+      description: Allow CORS
+      responses:
+        200:
+          $ref: '#/components/responses/cors'
+      x-amazon-apigateway-integration:
+        type: mock
+        requestTemplates:
+          application/json: "{ \"statusCode\": 200 }"
+        responses:
+          default:
+            statusCode: "200"
+            responseParameters:
+              method.response.header.Access-Control-Allow-Methods: "'GET'"
+              method.response.header.Access-Control-Allow-Headers: "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token'"
+              method.response.header.Access-Control-Allow-Origin: "'*'"
+
 
 components:
   schemas:

@@ -33,3 +33,7 @@ variable "frankii_format_service_function_name" {
   default = "frankii-format-service"
 }
 
+variable "frankii_delete_input_template_function_name" {
+  type    = string
+  default = "frankii-delete-input-template"
+}

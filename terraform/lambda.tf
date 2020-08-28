@@ -39,6 +39,15 @@ resource "aws_lambda_function" "format_service" {
   role = aws_iam_role.frankii_lambda_iam_role.arn
 }
 
+resource "aws_lambda_function" "delete_input_template" {
+  function_name = var.frankii_delete_input_template_function_name
+  filename      = "../app/${var.frankii_delete_input_template_function_name}.zip"
+  handler       = "${var.frankii_delete_input_template_function_name}.handler"
+  runtime       = "nodejs12.x"
+
+  role = aws_iam_role.frankii_lambda_iam_role.arn
+}
+
 # IAM role which dictates what other AWS services the Lambda function
 # may access.
 resource "aws_iam_role" "frankii_lambda_iam_role" {
@@ -75,7 +84,8 @@ resource "aws_lambda_permission" "apigw_lambda_permission" {
     aws_lambda_function.get_question_categories.function_name,
     aws_lambda_function.get_input_template.function_name,
     aws_lambda_function.register_input_template.function_name,
-    aws_lambda_function.format_service.function_name
+    aws_lambda_function.format_service.function_name,
+    aws_lambda_function.delete_input_template.function_name
   ])
 
   statement_id = "AllowAPIGatewayInvoke"
