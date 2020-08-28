@@ -1,5 +1,5 @@
 variable "SLACK_CLIENT_ID" {
-  type = string
+  type    = string
   default = "1143430565459.1244608157088"
 }
 

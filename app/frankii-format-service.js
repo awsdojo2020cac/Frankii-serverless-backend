@@ -1,23 +1,54 @@
-//setup dynamo-db stuff
 const AWS = require("aws-sdk");
 AWS.config.update({region: "ap-northeast-1"});
 const dynamodb = new AWS.DynamoDB.DocumentClient;
 
-//helper functions
-function generateQuestionText(input) {
-    let questionTemplate = ["現在以下のタスクに取り組んでいます。\n\`\`\`", "task", "\`\`\` \n*", "genre", "* に関して、以下の事象が発生しました:dizzy_face:：\n\`\`\`", "errorContent", "\`\`\` \n", "エラーメッセージはこれです:sob:：\n\`\`\`", "errorMsg", "\`\`\`"];
+exports.handler = async (event, context) => {
+    const body = JSON.parse(event.body);
 
-    getQuestionTemplate("errors").then(res => console.log(res, "hi")); //todo
+    const templateData = await getQuestionTemplate(body.category);
+    const template = templateData.Item.template;
+    const questionText = generateQuestionText(template, body.input);
+    const savedData = {
+        TableName: 'formatted_question_text',
+        Item: {
+            UUID: context.awsRequestId,
+            questionText: questionText,
+            sender: "jonathan",
+            receiver: "nakashima"
+        }
+    };
+    await saveItemtoDynamoDB(savedData);
 
+    const response = {
+        statusCode: 200,
+        body: questionText,
+    };
+    return response;
+
+};
+
+function generateQuestionText(template, input) {
     const keys = Object.keys(input);
     keys.forEach(key => {
-            if (questionTemplate.includes(key)) {
-                let index = questionTemplate.indexOf(key);
-                questionTemplate[index] = input[key];
+            if (template.includes(key)) {
+                let index = template.indexOf(key);
+                template[index] = input[key];
             }
         }
     );
-    return (questionTemplate.join(''));
+    return (template.join(''));
+}
+
+function getQuestionTemplate(category) {
+    const params = {
+        TableName: 'frankiis_questions',
+        Key: {"category": category},
+        ProjectionExpression: "template"
+    };
+    return dynamodb.get(params, function (err, data) {
+        if (err) console.log(err, err.stack); // an error occurred
+        else return data;
+    }).promise();
 }
 
 function saveItemtoDynamoDB(params) {
@@ -30,35 +61,3 @@ function saveItemtoDynamoDB(params) {
     }).promise();
 }
 
-function getQuestionTemplate(category) {
-    const params = {
-        TableName: 'question_templates',
-        Key: {"category": category}
-    };
-    return dynamodb.get(params, function (err, data) {
-        if (err) console.log(err, err.stack); // an error occurred
-        else return data;
-    }).promise();
-}
-
-exports.handler = async (event, context) => {
-    const questionText = generateQuestionText(event);
-    const params = {
-        TableName: 'formatted_question_text',
-        Item: {
-            UUID: context.awsRequestId,
-            questionText: questionText,
-            sender: "jonathan",
-            receiver: "nakashima"
-        }
-    };
-
-    await saveItemtoDynamoDB(params);
-
-    const response = {
-        statusCode: 200,
-        body: questionText,
-    };
-    return response;
-
-};

@@ -21,7 +21,8 @@ function registerInputTemplate(body) {
             "category": body.category,
             "description": body.description,
             "displayText": body.displayText,
-            'blocks': body.blocks
+            'blocks': body.blocks,
+            'template': body.template
         }
     };
 

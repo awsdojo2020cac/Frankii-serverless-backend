@@ -32,8 +32,8 @@ resource "aws_lambda_function" "register_input_template" {
 
 resource "aws_lambda_function" "format_service" {
   function_name = var.frankii_format_service_function_name
-  filename      = "../app/${var.frankii_get_question_categories_function_name}.zip"
-  handler       = "${var.frankii_get_question_categories_function_name}.handler"
+  filename      = "../app/${var.frankii_format_service_function_name}.zip"
+  handler       = "${var.frankii_format_service_function_name}.handler"
   runtime       = "nodejs12.x"
 
   role = aws_iam_role.frankii_lambda_iam_role.arn
