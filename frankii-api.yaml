@@ -193,9 +193,8 @@ paths:
         uri: ${delete_input_template_function_invoke_arn}
         httpMethod: "POST"
         type: "aws_proxy"
-        request_parameters: {
+        request_parameters:
           "integration.request.body.categories":  "method.request.body.categories"
-        }
     options:
       description: Allow CORS
       responses:
@@ -209,7 +208,7 @@ paths:
           default:
             statusCode: "200"
             responseParameters:
-              method.response.header.Access-Control-Allow-Methods: "'GET'"
+              method.response.header.Access-Control-Allow-Methods: "'POST'"
               method.response.header.Access-Control-Allow-Headers: "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token'"
               method.response.header.Access-Control-Allow-Origin: "'*'"
   /user/get-auth:
