@@ -18,6 +18,7 @@ tags:
     description: "Adminが操作するAPI"
   - name: "Format"
     description: "質問者の文書フォーマット化"
+  - name: "Auth"
 
 paths:
   /user/question-categories:
@@ -164,29 +165,22 @@ paths:
         httpMethod: "POST"
         type: "aws_proxy"
 
-  /admin/template/delete/{category}:
+  /admin/template/delete:
     post:
       tags:
         - "Admin Actions"
       summary: "テンプレート削除"
-      parameters:
-        - in: "path"
-          name: "category"
-          schema:
-            type: string
-          required: true
       requestBody:
         required: true
         content:
           application/json:
             schema:
-              type: "array"
-              items:
-                type: "object"
-                properties:
-                  category:
-                    type: "string"
-                    description: ""
+              type: "object"
+              properties:
+                categories:
+                  type: "array"
+                  items:
+                    type: string
       responses:
         200:
           description: ""
@@ -200,7 +194,7 @@ paths:
         httpMethod: "POST"
         type: "aws_proxy"
         request_parameters: {
-          "integration.request.path.category":  "method.request.path.category"
+          "integration.request.body.categories":  "method.request.body.categories"
         }
     options:
       description: Allow CORS
@@ -218,7 +212,46 @@ paths:
               method.response.header.Access-Control-Allow-Methods: "'GET'"
               method.response.header.Access-Control-Allow-Headers: "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token'"
               method.response.header.Access-Control-Allow-Origin: "'*'"
-
+  /user/get-auth:
+    get:
+      tags:
+        - "Auth"
+      summary: "Authを取得"
+      parameters:
+        - in: query
+          name: code
+          schema:
+            type: string
+      responses:
+        200:
+          description: "成功時のレスポンス"
+          content:
+            application/json:
+              schema:
+                type: "string"
+      x-amazon-apigateway-integration:
+        uri: ${get_auth_function_invoke_arn}
+        httpMethod: "POST"
+        type: "aws_proxy"
+        request_parameters: {
+          "integration.request.querystring.code":  "method.request.queryString.code"
+        }
+    options:
+      description: Allow CORS
+      responses:
+        200:
+          $ref: '#/components/responses/cors'
+      x-amazon-apigateway-integration:
+        type: mock
+        requestTemplates:
+          application/json: "{ \"statusCode\": 200 }"
+        responses:
+          default:
+            statusCode: "200"
+            responseParameters:
+              method.response.header.Access-Control-Allow-Methods: "'GET'"
+              method.response.header.Access-Control-Allow-Headers: "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token'"
+              method.response.header.Access-Control-Allow-Origin: "'*'"
 
 components:
   schemas:
@@ -307,6 +340,7 @@ components:
         application/json:
           schema:
             type: string
+
 
 externalDocs:
   description: "Find out more about Frankii"
