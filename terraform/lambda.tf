@@ -48,6 +48,24 @@ resource "aws_lambda_function" "delete_input_template" {
   role = aws_iam_role.frankii_lambda_iam_role.arn
 }
 
+resource "aws_lambda_function" "get_auth" {
+  function_name = var.frankii_get_auth
+  filename      = "../app/${var.frankii_get_auth}.zip"
+  handler       = "${var.frankii_get_auth}.handler"
+  runtime       = "nodejs12.x"
+
+  role = aws_iam_role.frankii_lambda_iam_role.arn
+
+  environment {
+    variables = {
+      SLACK_CLIENT_ID     = var.SLACK_CLIENT_ID
+      SLACK_CLIENT_SECRET = var.SLACK_CLIENT_SECRET
+      TOKEN_TABLE         = "frankii-tokens"
+    }
+  }
+}
+
+
 # IAM role which dictates what other AWS services the Lambda function
 # may access.
 resource "aws_iam_role" "frankii_lambda_iam_role" {
@@ -85,7 +103,8 @@ resource "aws_lambda_permission" "apigw_lambda_permission" {
     aws_lambda_function.get_input_template.function_name,
     aws_lambda_function.register_input_template.function_name,
     aws_lambda_function.format_service.function_name,
-    aws_lambda_function.delete_input_template.function_name
+    aws_lambda_function.delete_input_template.function_name,
+    aws_lambda_function.get_auth.function_name
   ])
 
   statement_id = "AllowAPIGatewayInvoke"

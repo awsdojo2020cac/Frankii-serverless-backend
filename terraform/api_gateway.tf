@@ -13,6 +13,7 @@ resource "aws_api_gateway_rest_api" "frankii_api" {
     register_input_template_function_invoke_arn = aws_lambda_function.register_input_template.invoke_arn
     format_service_function_invoke_arn          = aws_lambda_function.format_service.invoke_arn
     delete_input_template_function_invoke_arn   = aws_lambda_function.delete_input_template.invoke_arn
+`    get_auth_function_invoke_arn                = aws_lambda_function.get_auth.invoke_arn
   })
 }
 

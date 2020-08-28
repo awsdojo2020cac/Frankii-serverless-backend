@@ -37,3 +37,8 @@ variable "frankii_delete_input_template_function_name" {
   type    = string
   default = "frankii-delete-input-template"
 }
+
+variable "frankii_get_auth" {
+  type    = string
+  default = "frankii-get-auth"
+}
