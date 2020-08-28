@@ -4,10 +4,10 @@ AWS.config.update({region: "ap-northeast-1"});
 const dynamodb = new AWS.DynamoDB.DocumentClient;
 
 exports.handler = async (event) => {
-    let data = await deleteInputTemplate(event.pathParameters.category);
+    const body = JSON.parse(event.body);
+    await deleteInputTemplate(body.categories);
     const response = {
         statusCode: 200,
-        body: JSON.stringify(data["Item"]),
         headers: {
             'Access-Control-Allow-Origin': '*'
         }
@@ -15,12 +15,18 @@ exports.handler = async (event) => {
     return response;
 };
 
-function deleteInputTemplate(category) {
+function deleteInputTemplate(categories) {
     const params = {
-        TableName: 'frankiis_questions',
-        Key: {"category": category}
+        RequestItems: {
+            'frankiis_questions': []
+        }
     };
-    return dynamodb.delete(params, (err, data) => {
+    categories.forEach(category => params.RequestItems.frankiis_questions.push(
+        {DeleteRequest: {Key: {category: category}}}
+        )
+    );
+
+    return dynamodb.batchWrite(params, (err, data) => {
         if (err) {
             console.log(err); // an error occurred
         }
