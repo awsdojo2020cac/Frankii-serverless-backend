@@ -21,7 +21,10 @@ exports.handler = async (event, context) => {
 
     const response = {
         statusCode: 200,
-        body: questionText,
+        headers: {
+            'Access-Control-Allow-Origin': '*'
+        },
+        body: questionText
     };
     return response;
 
