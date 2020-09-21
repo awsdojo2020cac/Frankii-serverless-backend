@@ -42,3 +42,8 @@ variable "frankii_get_auth" {
   type    = string
   default = "frankii-get-auth"
 }
+
+variable "frankii_main_dynamodb_table_name" {
+  type    = string
+  default = "frankiis_questions"
+}

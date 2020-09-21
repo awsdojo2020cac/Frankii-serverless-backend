@@ -117,6 +117,7 @@ paths:
           description: "成功時のレスポンス"
       x-amazon-apigateway-integration:
         uri: ${register_input_template_function_invoke_arn}
+        passthroughBehavior: "when_no_match"
         httpMethod: "POST"
         type: "aws_proxy"
         request_parameters:
@@ -140,6 +141,7 @@ paths:
               method.response.header.Access-Control-Allow-Methods: "'POST'"
               method.response.header.Access-Control-Allow-Headers: "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token'"
               method.response.header.Access-Control-Allow-Origin: "'*'"
+        passthroughBehavior: "when_no_match"
 
   /user/format:
     post:
@@ -205,6 +207,7 @@ paths:
                 example: "success"
       x-amazon-apigateway-integration:
         uri: ${delete_input_template_function_invoke_arn}
+        passthroughBehavior: "when_no_match"
         httpMethod: "POST"
         type: "aws_proxy"
         request_parameters:
@@ -225,6 +228,7 @@ paths:
               method.response.header.Access-Control-Allow-Methods: "'POST'"
               method.response.header.Access-Control-Allow-Headers: "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token'"
               method.response.header.Access-Control-Allow-Origin: "'*'"
+        passthroughBehavior: "when_no_match"
   /user/get-auth:
     get:
       tags:
